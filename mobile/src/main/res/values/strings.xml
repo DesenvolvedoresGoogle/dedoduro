@@ -26,4 +26,6 @@
     <string name="lbl_distraction_information">Não existem distrações cadastradas.</string>
     <string name="drawer_open">Dedo duro</string>
     <string name="drawer_close">Categorias</string>
+    <string name="title_activity_auth">AuthActivity</string>
+
 </resources>
