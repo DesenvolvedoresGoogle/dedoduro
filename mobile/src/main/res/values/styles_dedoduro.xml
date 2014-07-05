@@ -38,6 +38,7 @@
         <item name="backgroundStacked">@drawable/ab_stacked_solid_dedoduro</item>
         <item name="backgroundSplit">@drawable/ab_bottom_solid_dedoduro</item>
         <item name="progressBarStyle">@style/ProgressBar.Dedoduro</item>
+        <item name="android:icon">@drawable/ic_actionbar</item>
     </style>
 
     <style name="ActionBar.Transparent.Dedoduro" parent="@style/Widget.Sherlock.Light.ActionBar">
