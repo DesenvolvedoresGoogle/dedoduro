@@ -24,5 +24,6 @@
     <string name="btn_yes">Sim</string>
     <string name="btn_no">Não</string>
     <string name="lbl_distraction_information">Não existem distrações cadastradas.</string>
-
+    <string name="drawer_open">Dedo duro</string>
+    <string name="drawer_close">Categorias</string>
 </resources>
