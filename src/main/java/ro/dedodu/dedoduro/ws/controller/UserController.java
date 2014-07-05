@@ -1,11 +1,9 @@
 package ro.dedodu.dedoduro.ws.controller;
 
+import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ro.dedodu.dedoduro.ws.model.entity.User;
 import ro.dedodu.dedoduro.ws.model.repository.UserRepository;
 
@@ -39,5 +37,16 @@ public class UserController {
         repository.save(user);
     }
 
-    //TODO Implementar login.
+    @RequestMapping(value = "login", method = RequestMethod.GET)
+    public User login(@RequestParam("email") String email, @RequestParam("password") String password) {
+        User user = repository.findByEmail(email);
+
+        Preconditions.checkNotNull(user, "Usuário inexistente.");
+
+        if (password.equals(user.getPassword())) {
+            return user;
+        }
+
+        return null;
+    }
 }

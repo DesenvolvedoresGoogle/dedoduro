@@ -11,4 +11,7 @@ import ro.dedodu.dedoduro.ws.model.entity.User;
  * @version 1.0.0
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {}
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    public User findByEmail(String email);
+}
