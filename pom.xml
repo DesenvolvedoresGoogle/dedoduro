@@ -50,10 +50,11 @@
         </dependency>
         <!-- end::actuator[] -->
 
+        <!-- Driver JDBC-->
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <scope>runtime</scope>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.31</version>
         </dependency>
 
         <!-- Google Core Libraries -->
@@ -62,6 +63,5 @@
             <artifactId>guava</artifactId>
             <version>17.0</version>
         </dependency>
-
     </dependencies>
 </project>
