@@ -14,7 +14,7 @@ public class HttpClient {
         queue = Volley.newRequestQueue(context);
     }
 
-    private static HttpClient getClient(Context context) {
+    public static HttpClient getClient(Context context) {
         if (client == null) {
             client = new HttpClient(context);
         }
@@ -23,5 +23,19 @@ public class HttpClient {
 
     public RequestQueue getRequestQueue() {
         return this.queue;
+    }
+
+    public enum RequestURL {
+        CATEGORY ("categories");
+
+        private String value;
+
+        private RequestURL(String value) {
+            this.value = "http://socmineira.no-ip.org:8080/" + value;
+        }
+
+        public String value() {
+            return value;
+        }
     }
 }

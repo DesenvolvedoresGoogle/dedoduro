@@ -1,5 +1,6 @@
 package ro.dedodu.dedoduro.mobile.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -12,7 +13,15 @@ import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockActivit
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import ro.dedodu.dedoduro.mobile.R;
+import ro.dedodu.dedoduro.mobile.adapter.CategoryAdapter;
+import ro.dedodu.dedoduro.mobile.dao.CategoryDao;
+import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
+import ro.dedodu.dedoduro.mobile.model.Category;
+import ro.dedodu.dedoduro.mobile.services.PullingService;
 import roboguice.inject.InjectView;
 
 public class MainActivity extends RoboSherlockActivity {
@@ -25,15 +34,23 @@ public class MainActivity extends RoboSherlockActivity {
 
     private GoogleMap map;
     private ActionBarDrawerToggle drawerToggle;
+    private CategoryDao categoryDao;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DaoFactory<CategoryDao> daoFactory = new DaoFactory<CategoryDao>();
+        categoryDao = daoFactory.create(this, CategoryDao.class);
+
+        Intent service = new Intent(this, PullingService.class);
+        startService(service);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         initializeDrawerMenu();
+        fillCategoryList();
         initializeMap();
     }
 
@@ -51,6 +68,14 @@ public class MainActivity extends RoboSherlockActivity {
         };
 
         drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    private void fillCategoryList() {
+        try {
+            List<Category> categories = categoryDao.queryForAll();
+            CategoryAdapter adapter = new CategoryAdapter(this, categories);
+            listView.setAdapter(adapter);
+        } catch (SQLException e) {}
     }
 
     private void initializeMap() {
