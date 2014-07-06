@@ -7,138 +7,301 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.IntentSender;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.util.Log;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockActivity;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusClient;
+
+import java.io.IOException;
 
 import ro.dedodu.dedoduro.mobile.R;
 import roboguice.inject.InjectView;
 
 
-public class AuthActivity extends RoboSherlockActivity implements View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener {
+public class AuthActivity extends Activity implements
+        ConnectionCallbacks, OnConnectionFailedListener, View.OnClickListener,
+        PlusClient.OnAccessRevokedListener {
 
-    @InjectView(R.id.sign_out_button)
-    Button signOutBtn;
+    private static final String TAG = "SignInTestActivity";
 
-    private static final String TAG = "ExampleActivity";
-    private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
+    // A magic number we will use to know that our sign-in error
+    // resolution activity has completed.
+    private static final int OUR_REQUEST_CODE = 49404;
 
-    private ProgressDialog mConnectionProgressDialog;
+    // The core Google+ client.
     private PlusClient mPlusClient;
+
+    // A flag to stop multiple dialogues appearing for the user.
+    private boolean mResolveOnFail;
+
+    // We can store the connection result from a failed connect()
+    // attempt in order to make the application feel a bit more
+    // responsive for the user.
     private ConnectionResult mConnectionResult;
 
-    private final Activity myActivity = this.getParent();
+    // A progress dialog to display when the user is connecting in
+    // case there is a delay in any of the dialogs being ready.
+    private ProgressDialog mConnectionProgressDialog;
+
+    Button signOutBtn;
+    TextView textView1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-
+        // We pass through this for all three arguments, specifying the:
+        // 1. Context
+        // 2. Object to call onConnected and onDisconnected on
+        // 3. Object to call onConnectionFailed on
         mPlusClient = new PlusClient.Builder(this, this, this)
-                .setActions(
-                    "http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
-                .setScopes("PLUS_LOGIN")
-                // Space separated list of scopes
-                //.setVisibleActivities("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
+                //.setActions("http://schemas.google.com/BuyActivity")
+                .setScopes(Scopes.PROFILE, Scopes.PLUS_LOGIN, Scopes.PLUS_ME)
+                //       "https://www.googleapis.com/auth/plus.login",
+                //        "https://www.googleapis.com/auth/plus.me",
+                //        "https://www.googleapis.com/auth/userinfo.email",
+                //        "https://www.googleapis.com/auth/userinfo.profile")
                 .build();
-        // A barra de progresso deve ser exibida se a falha de conexão não for resolvida.
+
+        // We use mResolveOnFail as a flag to say whether we should trigger
+        // the resolution of a connectionFailed ConnectionResult.
+        mResolveOnFail = false;
+
+        signOutBtn = (Button) findViewById(R.id.sign_out_button);
+        textView1 = (TextView) findViewById(R.id.textView);
+
+
+        // Connect our sign in, sign out and disconnect buttons.
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        signOutBtn.setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
+
+        // Configure the ProgressDialog that will be shown if there is a
+        // delay in presenting the user with the next sign in step.
         mConnectionProgressDialog = new ProgressDialog(this);
         mConnectionProgressDialog.setMessage("Signing in...");
-
-
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-
-        signOutBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                if (mPlusClient.isConnected()) {
-                    mPlusClient.clearDefaultAccount();
-                    mPlusClient.disconnect();
-                    mPlusClient.connect();
-                }
-            }
-        });
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        Log.v(TAG, "Start");
+        // Every time we start we want to try to connect. If it
+        // succeeds we'll get an onConnected() callback. If it
+        // fails we'll get onConnectionFailed(), with a result!
         mPlusClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.v(TAG, "Stop");
+        // It can be a little costly to keep the connection open
+        // to Google Play Services, so each time our activity is
+        // stopped we should disconnect.
         mPlusClient.disconnect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        if (mConnectionProgressDialog.isShowing()) {
-            // O usuário já clicou no botão de login. Iniciar resolução
-            // dos erros de conexão. Aguardar até que o onConnected() dispense a
-            // caixa de diálogo de conexão.
-            if (result.hasResolution()) {
-                try {
-                    result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
-                } catch (IntentSender.SendIntentException e) {
-                    mPlusClient.connect();
-                }
+        Log.v(TAG, "ConnectionFailed");
+        // Most of the time, the connection will fail with a
+        // user resolvable result. We can store that in our
+        // mConnectionResult property ready for to be used
+        // when the user clicks the sign-in button.
+        if (result.hasResolution()) {
+            mConnectionResult = result;
+            if (mResolveOnFail) {
+                // This is a local helper function that starts
+                // the resolution of the problem, which may be
+                // showing the user an account chooser or similar.
+                startResolution();
             }
-        }
-        // Salvar a intenção para que possamos iniciar uma atividade quando o usuário clicar
-        // no botão de login.
-        mConnectionResult = result;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
-        if (requestCode == REQUEST_CODE_RESOLVE_ERR && responseCode == RESULT_OK) {
-            mConnectionResult = null;
-            mPlusClient.connect();
         }
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        String accountName = mPlusClient.getAccountName();
-        Toast.makeText(this, accountName + " is connected.", Toast.LENGTH_LONG).show();
-        // Resolvemos todos os erros de conexão.
+        // Yay! We can get the oAuth 2.0 access token we are using.
+        Log.v(TAG, "Connected. Yay!");
+        textView1.setText(mPlusClient.getAccountName());
+
+        // Turn off the flag, so if the user signs out they'll have to
+        // tap to sign in again.
+        mResolveOnFail = false;
+
+        // Hide the progress dialog if its showing.
         mConnectionProgressDialog.dismiss();
+
+        // Hide the sign in button, show the sign out buttons.
+        findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
+        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+
+        // Retrieve the oAuth 2.0 access token.
+        final Context context = this.getApplicationContext();
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object... params) {
+                String scope = "oauth2:" + Scopes.PLUS_LOGIN;
+                try {
+                    // We can retrieve the token to check via
+                    // tokeninfo or to pass to a service-side
+                    // application.
+                    String token = GoogleAuthUtil.getToken(context,  mPlusClient.getAccountName(), scope);
+
+
+                } catch (UserRecoverableAuthException e) {
+                    // This error is recoverable, so we could fix this
+                    // by displaying the intent to the user.
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (GoogleAuthException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+        task.execute((Void) null);
     }
 
     @Override
     public void onDisconnected() {
-        Log.d(TAG, "disconnected");
+        // Bye!
+        Log.v(TAG, "Disconnected. Bye!");
+    }
+
+    protected void onActivityResult(int requestCode, int responseCode,
+                                    Intent intent) {
+        Log.v(TAG, "ActivityResult: " + requestCode);
+        if (requestCode == OUR_REQUEST_CODE && responseCode == RESULT_OK) {
+            // If we have a successful result, we will want to be able to
+            // resolve any further errors, so turn on resolution with our
+            // flag.
+            mResolveOnFail = true;
+            // If we have a successful result, lets call connect() again. If
+            // there are any more errors to resolve we'll get our
+            // onConnectionFailed, but if not, we'll get onConnected.
+            mPlusClient.connect();
+        } else if (requestCode == OUR_REQUEST_CODE && responseCode != RESULT_OK) {
+            // If we've got an error we can't resolve, we're no
+            // longer in the midst of signing in, so we can stop
+            // the progress spinner.
+            mConnectionProgressDialog.dismiss();
+        }
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
-            if (mConnectionResult == null) {
-                mConnectionProgressDialog.show();
-            } else {
-                try {
-                    mConnectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
-                } catch (IntentSender.SendIntentException e) {
-                    // Tente se conectar novamente.
-                    mConnectionResult = null;
-                    mPlusClient.connect();
+        switch (view.getId()) {
+            case R.id.sign_in_button:
+                Log.v(TAG, "Tapped sign in");
+                if (!mPlusClient.isConnected()) {
+                    // Show the dialog as we are now signing in.
+                    mConnectionProgressDialog.show();
+                    // Make sure that we will start the resolution (e.g. fire the
+                    // intent and pop up a dialog for the user) for any errors
+                    // that come in.
+                    mResolveOnFail = true;
+                    // We should always have a connection result ready to resolve,
+                    // so we can start that process.
+                    if (mConnectionResult != null) {
+                        startResolution();
+                    } else {
+                        // If we don't have one though, we can start connect in
+                        // order to retrieve one.
+                        mPlusClient.connect();
+                    }
                 }
-            }
+                break;
+            case R.id.sign_out_button:
+                Log.v(TAG, "Tapped sign out");
+                // We only want to sign out if we're connected.
+                if (mPlusClient.isConnected()) {
+                    // Clear the default account in order to allow the user
+                    // to potentially choose a different account from the
+                    // account chooser.
+                    mPlusClient.clearDefaultAccount();
+
+                    mPlusClient.revokeAccessAndDisconnect(new PlusClient.OnAccessRevokedListener() {
+                        @Override
+                        public void onAccessRevoked(ConnectionResult status) {
+                            Log.v(TAG, "onAccessRevoked - Disconnected. Bye!");
+                            // O mPlusClient agora está desconectado e o acesso foi revogado.
+                            // Acionar a lógica do aplicativo para cumprir as políticas do desenvolvedor
+                        }
+                    });
+
+                    // Disconnect from Google Play Services, then reconnect in order to restart the process from scratch.
+                    mPlusClient.disconnect();
+                    mPlusClient.connect();
+
+                    // Hide the sign out buttons, show the sign in button.
+                    findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+                    findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
+
+                    textView1.setText("");
+
+                }
+                break;
+
+            default:
+                // Unknown id.
         }
     }
 
+    @Override
+    public void onAccessRevoked(ConnectionResult status) {
+        // mPlusClient is now disconnected and access has been revoked.
+        // We should now delete any data we need to comply with the
+        // developer properties. To reset ourselves to the original state,
+        // we should now connect again. We don't have to disconnect as that
+        // happens as part of the call.
+        mPlusClient.connect();
+
+        // Hide the sign out buttons, show the sign in button.
+        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
+
+    }
+
+    /**
+     * A helper method to flip the mResolveOnFail flag and start the resolution
+     * of the ConnenctionResult from the failed connect() call.
+     */
+    private void startResolution() {
+        try {
+            // Don't start another resolution now until we have a
+            // result from the activity we're about to start.
+            mResolveOnFail = false;
+            // If we can resolve the error, then call start resolution
+            // and pass it an integer tag we can use to track. This means
+            // that when we get the onActivityResult callback we'll know
+            // its from being started here.
+            mConnectionResult.startResolutionForResult(this, OUR_REQUEST_CODE);
+        } catch (IntentSender.SendIntentException e) {
+            // Any problems, just try to connect() again so we get a new
+            // ConnectionResult.
+            mPlusClient.connect();
+        }
+    }
 }

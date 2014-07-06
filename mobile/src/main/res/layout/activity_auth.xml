@@ -9,7 +9,6 @@
     tools:context="ro.dedodu.dedoduro.mobile.activities.AuthActivity">
 
     <TextView
-        android:text="@string/hello_world"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView" />
@@ -17,7 +16,11 @@
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/response_code"
+        android:layout_alignRight="@+id/sign_out_button"
+        android:layout_alignEnd="@+id/sign_out_button" />
 
     <Button
         android:layout_width="wrap_content"
