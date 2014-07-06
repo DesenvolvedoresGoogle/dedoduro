@@ -36,8 +36,9 @@ public class GpsRegisterController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
-    public void save(@RequestBody GpsRegister register) {
+    public Long save(@RequestBody GpsRegister register) {
         repository.save(register);
+        return register.getId();
     }
 
     //TODO Implementar a obtenção dos registros com base nos parâmetros zoom e karma.
