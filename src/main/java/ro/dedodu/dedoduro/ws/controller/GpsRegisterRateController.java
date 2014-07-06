@@ -2,10 +2,7 @@ package ro.dedodu.dedoduro.ws.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterRate;
 import ro.dedodu.dedoduro.ws.model.repository.GpsRegisterRateRepository;
 
@@ -42,5 +39,8 @@ public class GpsRegisterRateController {
         return rate.getId();
     }
 
-    //TODO Implementar a sumarização do karma.
+    @RequestMapping(value = "sum", method = RequestMethod.GET)
+    public Long summarizeByGpsRegister(@RequestParam("registerId") Long registerId) {
+        return repository.summarizeByGpsRegisterId(registerId);
+    }
 }
