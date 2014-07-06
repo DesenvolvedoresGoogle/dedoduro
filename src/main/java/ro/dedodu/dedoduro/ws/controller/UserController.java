@@ -33,8 +33,9 @@ public class UserController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
-    public void save(@RequestBody User user) {
+    public Long save(@RequestBody User user) {
         repository.save(user);
+        return user.getId();
     }
 
     @RequestMapping(value = "login", method = RequestMethod.GET)

@@ -35,4 +35,14 @@ public class Category extends AbstractPersistable<Long> {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    private String img;
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 }
