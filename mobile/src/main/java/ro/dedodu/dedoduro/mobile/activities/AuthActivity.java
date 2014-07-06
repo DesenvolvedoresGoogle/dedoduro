@@ -2,33 +2,33 @@ package ro.dedodu.dedoduro.mobile.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-
-import android.content.Context;
 import android.content.Intent;
-
 import android.content.IntentSender;
-import android.os.AsyncTask;
 import android.os.Bundle;
-
-import android.util.Log;
-
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.plus.PlusClient;
 
-import java.io.IOException;
+import java.sql.SQLException;
 
 import ro.dedodu.dedoduro.mobile.R;
+import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
+import ro.dedodu.dedoduro.mobile.dao.UserDao;
+import ro.dedodu.dedoduro.mobile.http.HttpClient;
+import ro.dedodu.dedoduro.mobile.http.JacksonJsonRequest;
+import ro.dedodu.dedoduro.mobile.model.User;
+
+import static ro.dedodu.dedoduro.mobile.http.HttpClient.RequestURL.USER;
 
 
 public class AuthActivity extends Activity implements
@@ -42,8 +42,6 @@ public class AuthActivity extends Activity implements
     private ConnectionResult connectionResult;
     private ProgressDialog progressDialog;
 
-    private TextView textView1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +52,7 @@ public class AuthActivity extends Activity implements
 
         resolveOnFail = false;
 
-        Button signOutBtn = (Button) findViewById(R.id.sign_out_button);
-        textView1 = (TextView) findViewById(R.id.textView);
-
         findViewById(R.id.sign_in_button).setOnClickListener(this);
-        signOutBtn.setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Entrando...");
     }
@@ -88,31 +81,8 @@ public class AuthActivity extends Activity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        textView1.setText(plusClient.getAccountName());
         resolveOnFail = false;
-        progressDialog.dismiss();
-        findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
-        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
-
-        final Context context = this.getApplicationContext();
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object... params) {
-                String scope = "oauth2:" + Scopes.PLUS_LOGIN;
-                try {
-                    String token = GoogleAuthUtil.getToken(context,  plusClient.getAccountName(), scope);
-
-                } catch (UserRecoverableAuthException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (GoogleAuthException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-        task.execute((Void) null);
+        registerUser();
     }
 
     @Override
@@ -144,35 +114,12 @@ public class AuthActivity extends Activity implements
                     }
                 }
                 break;
-            case R.id.sign_out_button:
-                if (plusClient.isConnected()) {
-                    plusClient.clearDefaultAccount();
-
-                    plusClient.revokeAccessAndDisconnect(new PlusClient.OnAccessRevokedListener() {
-                        @Override
-                        public void onAccessRevoked(ConnectionResult status) {
-                        }
-                    });
-
-                    plusClient.disconnect();
-                    plusClient.connect();
-
-                    findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-                    findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
-
-                    textView1.setText("");
-
-                }
-                break;
         }
     }
 
     @Override
     public void onAccessRevoked(ConnectionResult status) {
         plusClient.connect();
-
-        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-        findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
     }
 
     private void startResolution() {
@@ -182,5 +129,39 @@ public class AuthActivity extends Activity implements
         } catch (IntentSender.SendIntentException e) {
             plusClient.connect();
         }
+    }
+
+    private void registerUser() {
+        final User user =  new User();
+        user.setEmail(plusClient.getAccountName());
+
+        RequestQueue queue = HttpClient.getClient(this).getRequestQueue();
+        JacksonJsonRequest<User, Long> request = new JacksonJsonRequest<User, Long>(Request.Method.POST, USER.value(), user, new Response.Listener<Long>() {
+            @Override
+            public void onResponse(Long response) {
+                user.setId(response);
+
+                try {
+                    DaoFactory<UserDao> daoFactory = new DaoFactory<UserDao>();
+                    final UserDao userDao = daoFactory.create(AuthActivity.this, UserDao.class);
+
+                    userDao.createOrUpdate(user);
+                    openMainActivity();
+
+                } catch (SQLException e){ }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) { }
+        }, Long.class);
+
+        queue.add(request);
+        queue.start();
+    }
+
+    private void openMainActivity() {
+        progressDialog.dismiss();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

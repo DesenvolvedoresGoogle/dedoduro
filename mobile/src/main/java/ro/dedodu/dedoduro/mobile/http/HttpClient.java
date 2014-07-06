@@ -26,7 +26,9 @@ public class HttpClient {
     }
 
     public enum RequestURL {
-        CATEGORY ("categories");
+        CATEGORY("categories"),
+        USER("users"),
+        GPS_REGISTER("registers");
 
         private String value;
 

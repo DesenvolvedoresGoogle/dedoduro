@@ -10,6 +10,7 @@ import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 
 import ro.dedodu.dedoduro.mobile.model.Category;
+import ro.dedodu.dedoduro.mobile.model.User;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
@@ -24,6 +25,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
             TableUtils.createTable(connectionSource, Category.class);
+            TableUtils.createTable(connectionSource, User.class);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
