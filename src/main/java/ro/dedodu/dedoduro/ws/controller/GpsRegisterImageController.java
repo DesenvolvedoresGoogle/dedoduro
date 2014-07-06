@@ -47,13 +47,13 @@ public class GpsRegisterImageController {
     }
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
-    public void upload(@RequestParam("file") MultipartFile file) throws IOException {
+    public void upload(@RequestParam("name") String name, @RequestParam("file") MultipartFile file) throws IOException {
         Preconditions.checkArgument(!file.isEmpty(), "Arquivo vazio.");
 
         byte[] bytes = file.getBytes();
 
         try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(Paths.get(IMG_REPO,
-                file.getName()).toFile()))) {
+                name).toFile()))) {
             stream.write(bytes);
         }
     }
