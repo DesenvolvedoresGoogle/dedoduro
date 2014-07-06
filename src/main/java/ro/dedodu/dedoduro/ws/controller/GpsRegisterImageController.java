@@ -40,8 +40,10 @@ public class GpsRegisterImageController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
-    public void save(@RequestBody GpsRegisterImage image) {
+    public Long save(@RequestBody GpsRegisterImage image) {
         repository.save(image);
+
+        return image.getId();
     }
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)

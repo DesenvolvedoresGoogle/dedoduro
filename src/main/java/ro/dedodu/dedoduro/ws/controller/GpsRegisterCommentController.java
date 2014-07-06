@@ -36,7 +36,9 @@ public class GpsRegisterCommentController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
-    public void save(@RequestBody GpsRegisterComment comment) {
+    public Long save(@RequestBody GpsRegisterComment comment) {
         repository.save(comment);
+
+        return comment.getId();
     }
 }

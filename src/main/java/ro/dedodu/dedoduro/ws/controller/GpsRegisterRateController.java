@@ -36,8 +36,10 @@ public class GpsRegisterRateController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
-    public void save(@RequestBody GpsRegisterRate rate) {
+    public Long save(@RequestBody GpsRegisterRate rate) {
         repository.save(rate);
+
+        return rate.getId();
     }
 
     //TODO Implementar a sumarização do karma.

@@ -35,6 +35,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody User user) {
         repository.save(user);
+
         return user.getId();
     }
 

@@ -36,7 +36,9 @@ public class CategoryController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
-    public void save(@RequestBody Category category) {
+    public Long save(@RequestBody Category category) {
         repository.save(category);
+
+        return category.getId();
     }
 }

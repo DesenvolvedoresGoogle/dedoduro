@@ -38,6 +38,7 @@ public class GpsRegisterController {
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody GpsRegister register) {
         repository.save(register);
+
         return register.getId();
     }
 
