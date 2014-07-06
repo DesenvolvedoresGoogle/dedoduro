@@ -22,7 +22,6 @@ public class SplashScreenActivity extends RoboSherlockActivity {
 
         startPullingService();
 
-
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {

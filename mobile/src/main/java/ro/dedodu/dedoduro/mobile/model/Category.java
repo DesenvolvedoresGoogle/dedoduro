@@ -17,9 +17,6 @@ public class Category {
     private String name;
 
     @DatabaseField
-    private String description;
-
-    @DatabaseField
     private String img;
 
     public Integer getId() {
@@ -36,14 +33,6 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getImg() {
@@ -92,7 +81,6 @@ public class Category {
             Category category = new Category();
             category.setId((Integer) map.get("id"));
             category.setName((String) map.get("name"));
-            category.setDescription((String) map.get("description"));
             category.setImg((String) map.get("img"));
 
             return category;

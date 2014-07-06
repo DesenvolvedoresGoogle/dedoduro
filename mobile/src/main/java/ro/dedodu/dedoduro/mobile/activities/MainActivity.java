@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -35,6 +36,7 @@ import ro.dedodu.dedoduro.mobile.http.HttpClient;
 import ro.dedodu.dedoduro.mobile.http.JacksonJsonRequest;
 import ro.dedodu.dedoduro.mobile.model.Category;
 import ro.dedodu.dedoduro.mobile.model.GpsRegister;
+import ro.dedodu.dedoduro.mobile.model.Page;
 import roboguice.inject.InjectView;
 
 import static com.android.volley.Request.Method.GET;
@@ -91,7 +93,26 @@ public class MainActivity extends RoboSherlockActivity {
             CategoryAdapter adapter = new CategoryAdapter(this, categories, new CategoryAdapter.OnRowClickListener() {
                 @Override
                 public void onClick(Category category) {
-                    Toast.makeText(MainActivity.this, category.getName(), Toast.LENGTH_LONG).show();
+                    RequestQueue queue = HttpClient.getClient(MainActivity.this).getRequestQueue();
+
+                    JacksonJsonRequest<Void, Page> request =  new JacksonJsonRequest<Void, Page>(GET, HttpClient.RequestURL.QUERY_BY_CATEGORY.value() + category.getId(), null, new Response.Listener<Page>() {
+                        @Override
+                        public void onResponse(Page response) {
+                            map.clear();
+
+                            for (Object gpsRegister : (List)response.getContent()) {
+                                pinGpsRegisterMarker(GpsRegister.Converter.from((HashMap) gpsRegister));
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    }, Page.class);
+
+                    queue.add(request);
+                    queue.start();
                 }
             });
 
@@ -119,10 +140,10 @@ public class MainActivity extends RoboSherlockActivity {
 
     private void getGpsRegister() {
         RequestQueue queue = HttpClient.getClient(this).getRequestQueue();
-        JacksonJsonRequest<Void, List> request = new JacksonJsonRequest<Void, List>(GET, GPS_REGISTER.value(), null, new Response.Listener<List>() {
+        JacksonJsonRequest<Void, Page> request = new JacksonJsonRequest<Void, Page>(GET, GPS_REGISTER.value(), null, new Response.Listener<Page>() {
             @Override
-            public void onResponse(List response) {
-                for (Object gpsRegister : response) {
+            public void onResponse(Page response) {
+                for (Object gpsRegister : (List)response.getContent()) {
                     pinGpsRegisterMarker(GpsRegister.Converter.from((HashMap) gpsRegister));
                 }
             }
@@ -131,7 +152,7 @@ public class MainActivity extends RoboSherlockActivity {
             public void onErrorResponse(VolleyError error) {
 
             }
-        }, List.class);
+        }, Page.class);
 
         queue.add(request);
         queue.start();

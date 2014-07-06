@@ -30,7 +30,8 @@ public class HttpClient {
         USER("users"),
         GPS_REGISTER("registers"),
         GPS_REGISTER_RATE("karma"),
-        GPS_REGISTER_COMMENT("comments");
+        GPS_REGISTER_COMMENT("comments"),
+        QUERY_BY_CATEGORY("registers/byCategory?categoryId=");
 
         private String value;
 
