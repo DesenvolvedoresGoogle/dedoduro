@@ -31,16 +31,31 @@ public class GpsRegisterImageController {
 
     private final GpsRegisterImageRepository repository;
 
+    /**
+     * Construtor.
+     * @param repository Repositório de imagens.
+     */
     @Autowired
     public GpsRegisterImageController(GpsRegisterImageRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Busca por todos os registros de imagem.
+     * @param pageable Parâmetros de paginação.
+     * @return Página com os resultados.
+     */
     @RequestMapping(method = RequestMethod.GET)
     public Page<GpsRegisterImage> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
+    /**
+     * Busca todas as imagens de um dado registro.
+     * @param registerId Identificador do registro.
+     * @param pageable Parâmetros de paginação.
+     * @return Página com os resultados.
+     */
     @RequestMapping(value = "byRegister/{registerId}", method = RequestMethod.GET)
     public Page<GpsRegisterImage> findAllByGpsRegisterId(@PathVariable("registerId") Long registerId, Pageable pageable) {
         GpsRegister register = new GpsRegister();
@@ -49,6 +64,11 @@ public class GpsRegisterImageController {
         return repository.findAllByGpsRegister(register, pageable);
     }
 
+    /**
+     * Inclui/Altera um registro de imagem.
+     * @param image Registro do Imagem.
+     * @return Identificador.
+     */
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody GpsRegisterImage image) {
@@ -57,6 +77,12 @@ public class GpsRegisterImageController {
         return image.getId();
     }
 
+    /**
+     * Endpoint responsável pela recepção da imagem.
+     * @param name Nome do arquivo.
+     * @param file Arquivo.
+     * @throws IOException Está exceção será lançada caso não seja possível escrever a imagem em disco.
+     */
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     public void upload(@RequestParam("name") String name, @RequestParam("file") MultipartFile file) throws IOException {
         Preconditions.checkArgument(!file.isEmpty(), "Arquivo vazio.");

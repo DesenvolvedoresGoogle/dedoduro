@@ -24,16 +24,21 @@ import java.util.List;
 @EnableAutoConfiguration
 public class App extends WebMvcConfigurerAdapter {
 
+    /**
+     * Configuração do componente de upload de arquivos.
+     * @return Componente de upload.
+     */
     @Bean
-    MultipartConfigElement multipartConfigElement() {
+    public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-        //factory.setMaxFileSize("128KB");
-        //factory.setMaxRequestSize("128KB");
-        //TODO Implementar os limites para o arquivo.
 
         return factory.createMultipartConfig();
     }
 
+    /**
+     * Componentes de resolução automática dos parâmetros de paginação.
+     * @param argumentResolvers Componente de resolução de paginação.
+     */
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();

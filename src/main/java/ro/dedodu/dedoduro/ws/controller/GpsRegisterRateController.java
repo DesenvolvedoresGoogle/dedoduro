@@ -23,16 +23,29 @@ public class GpsRegisterRateController {
 
     private final GpsRegisterRateRepository repository;
 
+    /**
+     * Construtor.
+     * @param repository  Repositório de Karma.
+     */
     @Autowired
     public GpsRegisterRateController(GpsRegisterRateRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Busca por todos os registros de karma.
+     * @return Registros de karma.
+     */
     @RequestMapping(method = RequestMethod.GET)
     public List<GpsRegisterRate> findAll() {
         return repository.findAll();
     }
 
+    /**
+     * Inclui/Altera o karma.
+     * @param rate Karma.
+     * @return Identificador.
+     */
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody GpsRegisterRate rate) {
@@ -41,6 +54,12 @@ public class GpsRegisterRateController {
         return rate.getId();
     }
 
+    /**
+     * Busca pelo karma atribuido a um registro por um dado usuário.
+     * @param registerId Identificador do registro.
+     * @param userId Identificador do usuário.
+     * @return Karma.
+     */
     @RequestMapping(value = "byGpsRegisterAndUser", method = RequestMethod.GET)
     public GpsRegisterRate findByGpsRegisterAndUser(@RequestParam("registerId") Long registerId,
                                                     @RequestParam("userId") Long userId) {
@@ -53,6 +72,11 @@ public class GpsRegisterRateController {
         return repository.findByGpsRegisterAndUser(register, user);
     }
 
+    /**
+     * Busca o sumário de karma de um dado registro.
+     * @param registerId Identificador do registro.
+     * @return Karma atual.
+     */
     @RequestMapping(value = "sum", method = RequestMethod.GET)
     public Long summarizeByGpsRegister(@RequestParam("registerId") Long registerId) {
         return repository.summarizeByGpsRegisterId(registerId);

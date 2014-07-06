@@ -21,16 +21,29 @@ public class UserController {
 
     private final UserRepository repository;
 
+    /**
+     * Construtor.
+     * @param repository Repositório de usuários.
+     */
     @Autowired
     public UserController(UserRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Busca todos os usuários cadastrados.
+     * @return Usuários.
+     */
     @RequestMapping(method = RequestMethod.GET)
     public List<User> findAll() {
         return repository.findAll();
     }
 
+    /**
+     * inclui/Altera um usuário.
+     * @param user Usuário.
+     * @return Identificador.
+     */
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody User user) {
@@ -39,6 +52,12 @@ public class UserController {
         return user.getId();
     }
 
+    /**
+     * Endpoint de login do sistema.
+     * @param email E-mail do usuário.
+     * @param password Senha de acesso.
+     * @return Usuário.
+     */
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public User login(@RequestParam("email") String email, @RequestParam("password") String password) {
         User user = repository.findByEmail(email);

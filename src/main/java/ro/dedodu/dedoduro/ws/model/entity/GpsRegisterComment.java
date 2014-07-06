@@ -22,10 +22,18 @@ public class GpsRegisterComment  extends AbstractPersistable<Long> {
     @JoinColumn(name = "user_id")
     private User user;
 
+    /**
+     * Obtêm o usuário que realizou o comentário.
+     * @return Usuário.
+     */
     public User getUser() {
         return user;
     }
 
+    /**
+     * Define o usuário que realizou o comentário.
+     * @param user Usuário.
+     */
     public void setUser(User user) {
         this.user = user;
     }
@@ -34,20 +42,36 @@ public class GpsRegisterComment  extends AbstractPersistable<Long> {
     @JoinColumn(name = "gps_register_id")
     private GpsRegister gpsRegister;
 
+    /**
+     * Obtêm o registro ao qual o comentário pertence.
+     * @return Registro.
+     */
     public GpsRegister getGpsRegister() {
         return gpsRegister;
     }
 
+    /**
+     * Define o registro ao qual o comentário pertence.
+     * @param gpsRegister Registro.
+     */
     public void setGpsRegister(GpsRegister gpsRegister) {
         this.gpsRegister = gpsRegister;
     }
 
     private String comment;
 
+    /**
+     * Obtêm o comentário em si.
+     * @return Comentário.
+     */
     public String getComment() {
         return comment;
     }
 
+    /**
+     * Define o comentário em si.
+     * @param comment Comentário.
+     */
     public void setComment(String comment) {
         this.comment = comment;
     }

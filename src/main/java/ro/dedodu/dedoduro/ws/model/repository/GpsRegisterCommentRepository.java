@@ -17,5 +17,11 @@ import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterComment;
 @Repository
 public interface GpsRegisterCommentRepository extends JpaRepository<GpsRegisterComment, Long> {
 
+    /**
+     * Busca por todos os comentários de um dado registro.
+     * @param register Registro.
+     * @param pageable Parâmetros de paginação.
+     * @return Página com os resultados.
+     */
     public Page<GpsRegisterComment> findAllByGpsRegister(GpsRegister register, Pageable pageable);
 }

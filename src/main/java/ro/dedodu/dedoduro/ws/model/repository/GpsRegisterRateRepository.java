@@ -18,8 +18,19 @@ import ro.dedodu.dedoduro.ws.model.entity.User;
 @Repository
 public interface GpsRegisterRateRepository extends JpaRepository<GpsRegisterRate, Long> {
 
+    /**
+     * Sumariza o karma de um dado registro.
+     * @param registerId Identificador do registro.
+     * @return Sumarização.
+     */
     @Query("select sum(r.rate) from  GpsRegisterRate r where r.gpsRegister.id = :registerId")
     public Long summarizeByGpsRegisterId(@Param("registerId") Long registerId);
 
+    /**
+     * Busca o karma atribuído por um dado usuário para um dado registro.
+     * @param register Registro.
+     * @param user Usuário.
+     * @return Karma.
+     */
     public GpsRegisterRate findByGpsRegisterAndUser(GpsRegister register, User user);
 }

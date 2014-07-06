@@ -22,16 +22,31 @@ public class GpsRegisterCommentController {
 
     private final GpsRegisterCommentRepository repository;
 
+    /**
+     * Construtor.
+     * @param repository Repositório de comentários.
+     */
     @Autowired
     public GpsRegisterCommentController(GpsRegisterCommentRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Busca por todos os comentários.
+     * @param pageable Parâmetros de paginação.
+     * @return Página com os resultados.
+     */
     @RequestMapping(method = RequestMethod.GET)
     public Page<GpsRegisterComment> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
+    /**
+     * Busca por todos os comentários de um dado registro.
+     * @param registerId Identificador do registro.
+     * @param pageable Parâmetros de paginação.
+     * @return Página com os resultados.
+     */
     @RequestMapping(value = "byRegister/{registerId}", method = RequestMethod.GET)
     public Page<GpsRegisterComment> findAllByGpsRegisterId(@PathVariable("registerId") Long registerId, Pageable pageable) {
         GpsRegister register = new GpsRegister();
@@ -40,6 +55,11 @@ public class GpsRegisterCommentController {
         return repository.findAllByGpsRegister(register, pageable);
     }
 
+    /**
+     * Inclui/Altera um comentário.
+     * @param comment Comnetário.
+     * @return Identificador.
+     */
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody GpsRegisterComment comment) {

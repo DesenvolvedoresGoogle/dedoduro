@@ -13,5 +13,10 @@ import ro.dedodu.dedoduro.ws.model.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    /**
+     * Busca um usuário pelo e-mail cadastrado.
+     * @param email E-mail cadastrado.
+     * @return Usuário.
+     */
     public User findByEmail(String email);
 }

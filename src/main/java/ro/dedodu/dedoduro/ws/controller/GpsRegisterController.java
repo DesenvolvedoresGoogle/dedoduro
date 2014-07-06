@@ -22,16 +22,31 @@ public class GpsRegisterController {
 
     private final GpsRegisterRepository repository;
 
+    /**
+     * Construtor.
+     * @param repository Repositório de registros.
+     */
     @Autowired
     public GpsRegisterController(GpsRegisterRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Busca todos os registros.
+     * @param pageable Parâmetros de Paginação.
+     * @return Página com os resultados.
+     */
     @RequestMapping(method = RequestMethod.GET)
     public Page<GpsRegister> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
+    /**
+     * Busca por todos os registros de uma dada categoria.
+     * @param categoryId Identificador de categoria.
+     * @param pageable Parâmetros de Paginação.
+     * @return Página com os resultados.
+     */
     @RequestMapping(value = "byCategory", method = RequestMethod.GET)
     public Page<GpsRegister> findAllByCategory(@RequestParam("categoryId") Long categoryId, Pageable pageable) {
         Category category = new Category();
@@ -40,6 +55,11 @@ public class GpsRegisterController {
         return repository.findAllByCategory(category, pageable);
     }
 
+    /**
+     * Inclui/Altera um registro.
+     * @param register Registro.
+     * @return identificador.
+     */
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public Long save(@RequestBody GpsRegister register) {

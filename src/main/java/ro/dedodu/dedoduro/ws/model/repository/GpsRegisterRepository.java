@@ -17,5 +17,11 @@ import ro.dedodu.dedoduro.ws.model.entity.GpsRegister;
 @Repository
 public interface GpsRegisterRepository extends JpaRepository<GpsRegister, Long> {
 
+    /**
+     * Busca todos registros de uma dada categoria.
+     * @param category Categoria desejada.
+     * @param pageable Dados da paginação.
+     * @return Página de resultados.
+     */
     public Page<GpsRegister> findAllByCategory(Category category, Pageable pageable);
 }

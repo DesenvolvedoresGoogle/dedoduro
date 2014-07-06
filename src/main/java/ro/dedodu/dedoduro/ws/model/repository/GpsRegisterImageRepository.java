@@ -17,5 +17,11 @@ import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterImage;
 @Repository
 public interface GpsRegisterImageRepository extends JpaRepository<GpsRegisterImage, Long> {
 
+    /**
+     * Busca todos as imagens vinculadas a um registro.
+     * @param register Registro.
+     * @param pageable Parâmetros de Paginação.
+     * @return Página de resultados.
+     */
     public Page<GpsRegisterImage> findAllByGpsRegister(GpsRegister register, Pageable pageable);
 }
