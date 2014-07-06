@@ -161,7 +161,7 @@ public class MainActivity extends RoboSherlockActivity {
     private void pinGpsRegisterMarker(GpsRegister gpsRegister) {
         MarkerOptions markerOptions =  new MarkerOptions();
         markerOptions
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                .icon(BitmapDescriptorFactory.fromResource(gpsRegister.getCategory().markerResource()))
                 .position(new LatLng(gpsRegister.getLat(), gpsRegister.getLng()));
 
         Marker marker = map.addMarker(markerOptions);

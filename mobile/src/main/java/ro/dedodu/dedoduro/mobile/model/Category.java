@@ -47,20 +47,26 @@ public class Category {
         return Image.getImageResource(getImg());
     }
 
+    public int markerResource() {
+        return Image.getMarkerResource(getImg());
+    }
+
     private enum Image {
-        VIOLENCE("violence", R.drawable.violence),
-        EDUCATION("education", R.drawable.education),
-        COMPANY("company", R.drawable.company),
-        SERVICE("service", R.drawable.service),
-        TRACK("track", R.drawable.track),
-        STREET("street", R.drawable.street);
+        VIOLENCE("violence", R.drawable.violence, R.drawable.violence_p),
+        EDUCATION("education", R.drawable.education, R.drawable.education_p),
+        COMPANY("company", R.drawable.company, R.drawable.company_p),
+        SERVICE("service", R.drawable.service, R.drawable.service_p),
+        TRACK("track", R.drawable.track, R.drawable.track_p),
+        STREET("street", R.drawable.street, R.drawable.street_p);
 
         private String value;
         private int resource;
+        private int markerResource;
 
-        private Image(String value, int resource) {
+        private Image(String value, int resource, int markerResource) {
             this.value = value;
             this.resource = resource;
+            this.markerResource = markerResource;
         }
 
         public static int getImageResource(String type) {
@@ -68,6 +74,17 @@ public class Category {
             for (Image image : values()) {
                 if (image.value.equals(type)) {
                     resourceId = image.resource;
+                }
+            }
+
+            return resourceId;
+        }
+
+        public static int getMarkerResource(String type) {
+            int resourceId = 0;
+            for (Image image : values()) {
+                if (image.value.equals(type)) {
+                    resourceId = image.markerResource;
                 }
             }
 
