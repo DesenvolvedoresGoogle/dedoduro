@@ -1,14 +1,17 @@
 package ro.dedodu.dedoduro.ws.controller;
 
+import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterImage;
 import ro.dedodu.dedoduro.ws.model.repository.GpsRegisterImageRepository;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -22,6 +25,7 @@ import java.util.List;
 @RestController
 public class GpsRegisterImageController {
 
+    private static final String IMG_REPO = "/var/www/html/dedoduro/img/";
     private final GpsRegisterImageRepository repository;
 
     @Autowired
@@ -40,5 +44,15 @@ public class GpsRegisterImageController {
         repository.save(image);
     }
 
-    //TODO implementar o upload das imagens.
+    @RequestMapping(value = "upload", method = RequestMethod.POST)
+    public void upload(@RequestParam("file") MultipartFile file) throws IOException {
+        Preconditions.checkArgument(!file.isEmpty(), "Arquivo vazio.");
+
+        byte[] bytes = file.getBytes();
+
+        try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(Paths.get(IMG_REPO,
+                file.getName()).toFile()))) {
+            stream.write(bytes);
+        }
+    }
 }
