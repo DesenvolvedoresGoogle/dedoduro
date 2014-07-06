@@ -47,6 +47,4 @@ public class GpsRegisterController {
 
         return register.getId();
     }
-
-    //TODO Implementar a obtenção dos registros com base nos parâmetros zoom e karma.
 }
