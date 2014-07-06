@@ -27,5 +27,7 @@
     <string name="drawer_open">Dedo duro</string>
     <string name="drawer_close">Categorias</string>
     <string name="title_activity_auth">AuthActivity</string>
+    <string name="lbl_modal_title">Selecione a categoria</string>
+    <string name="category_dialog_title">Selecione uma categoria</string>
 
 </resources>

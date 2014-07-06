@@ -17,6 +17,9 @@ public class Category {
     @DatabaseField
     private String description;
 
+    @DatabaseField
+    private String img;
+
     public Integer getId() {
         return id;
     }
@@ -41,6 +44,23 @@ public class Category {
         this.description = description;
     }
 
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    public enum Image {
+        VIOLENCY,
+        EDUCATION,
+        COMPANY,
+        SERVICE,
+        TRACK,
+        STREET
+    }
+
     public static class Converter {
 
         public static Category from(HashMap map) {
@@ -48,6 +68,7 @@ public class Category {
             category.setId((Integer) map.get("id"));
             category.setName((String) map.get("name"));
             category.setDescription((String) map.get("description"));
+            category.setImg((String) map.get("img"));
 
             return category;
         }

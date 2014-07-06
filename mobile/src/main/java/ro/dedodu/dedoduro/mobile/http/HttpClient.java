@@ -31,7 +31,7 @@ public class HttpClient {
         private String value;
 
         private RequestURL(String value) {
-            this.value = "http://socmineira.no-ip.org:8080/" + value;
+            this.value = "http://10.10.10.127:8080/" + value;
         }
 
         public String value() {

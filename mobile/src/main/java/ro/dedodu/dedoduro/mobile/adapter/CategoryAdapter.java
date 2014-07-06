@@ -18,11 +18,13 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
 
     private List<Category> categories;
     private Context context;
+    private OnRowClickListener rowClickListener;
 
-    public CategoryAdapter(Context context, List<Category> categories) {
+    public CategoryAdapter(Context context, List<Category> categories, OnRowClickListener rowClickListener) {
         super(context, R.layout.category_list_row, categories);
         this.categories = categories;
         this.context = context;
+        this.rowClickListener = rowClickListener;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
 
         View row = inflater.inflate(R.layout.category_list_row, parent, false);
 
-        Category category = categories.get(position);
+        final Category category = categories.get(position);
 
         ImageView icon = (ImageView) row.findViewById(R.id.icon);
         TextView label = (TextView) row.findViewById(R.id.label);
@@ -39,6 +41,17 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
         icon.setImageResource(R.drawable.ic_launcher);
         label.setText(category.getName());
 
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rowClickListener.onClick(category);
+            }
+        });
+
         return row;
+    }
+
+    public interface OnRowClickListener {
+        public void onClick(Category category);
     }
 }

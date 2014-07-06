@@ -6,12 +6,14 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,7 +22,10 @@ import ro.dedodu.dedoduro.mobile.R;
 import ro.dedodu.dedoduro.mobile.adapter.CategoryAdapter;
 import ro.dedodu.dedoduro.mobile.dao.CategoryDao;
 import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
+import ro.dedodu.dedoduro.mobile.dialogs.GpsRegisterDialog;
 import ro.dedodu.dedoduro.mobile.model.Category;
+import ro.dedodu.dedoduro.mobile.model.GpsRegister;
+import ro.dedodu.dedoduro.mobile.model.User;
 import ro.dedodu.dedoduro.mobile.services.PullingService;
 import roboguice.inject.InjectView;
 
@@ -72,17 +77,31 @@ public class MainActivity extends RoboSherlockActivity {
 
     private void fillCategoryList() {
         try {
-            List<Category> categories = categoryDao.queryForAll();
-            CategoryAdapter adapter = new CategoryAdapter(this, categories);
+            final List<Category> categories = categoryDao.queryForAll();
+            CategoryAdapter adapter = new CategoryAdapter(this, categories, new CategoryAdapter.OnRowClickListener() {
+                @Override
+                public void onClick(Category category) {
+                    Toast.makeText(MainActivity.this, category.getName(), Toast.LENGTH_LONG).show();
+                }
+            });
+
             listView.setAdapter(adapter);
         } catch (SQLException e) {}
     }
 
     private void initializeMap() {
+
         MapFragment fragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         if (fragment != null) {
             map = fragment.getMap();
             map.setMyLocationEnabled(true);
+            map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    GpsRegisterDialog gpsRegisterDialog =  new GpsRegisterDialog(latLng);
+                    gpsRegisterDialog.show(getFragmentManager(), "");
+                }
+            });
         }
     }
 
