@@ -2,9 +2,12 @@ package ro.dedodu.dedoduro.ws.controller;
 
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ro.dedodu.dedoduro.ws.model.entity.GpsRegister;
 import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterImage;
 import ro.dedodu.dedoduro.ws.model.repository.GpsRegisterImageRepository;
 
@@ -12,7 +15,6 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * Controlador que provê o acesso às Imagens dos Eventos
@@ -26,6 +28,7 @@ import java.util.List;
 public class GpsRegisterImageController {
 
     private static final String IMG_REPO = "/var/www/html/dedoduro/img/";
+
     private final GpsRegisterImageRepository repository;
 
     @Autowired
@@ -34,8 +37,16 @@ public class GpsRegisterImageController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<GpsRegisterImage> findAll() {
-        return repository.findAll();
+    public Page<GpsRegisterImage> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    @RequestMapping(value = "byRegister/{registerId}", method = RequestMethod.GET)
+    public Page<GpsRegisterImage> findAllByGpsRegisterId(@PathVariable("registerId") Long registerId, Pageable pageable) {
+        GpsRegister register = new GpsRegister();
+        register.setId(registerId);
+
+        return repository.findAllByGpsRegister(register, pageable);
     }
 
     @Transactional

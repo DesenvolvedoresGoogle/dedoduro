@@ -3,7 +3,9 @@ package ro.dedodu.dedoduro.ws.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import ro.dedodu.dedoduro.ws.model.entity.GpsRegister;
 import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterRate;
+import ro.dedodu.dedoduro.ws.model.entity.User;
 import ro.dedodu.dedoduro.ws.model.repository.GpsRegisterRateRepository;
 
 import java.util.List;
@@ -37,6 +39,18 @@ public class GpsRegisterRateController {
         repository.save(rate);
 
         return rate.getId();
+    }
+
+    @RequestMapping(value = "byGpsRegisterAndUser", method = RequestMethod.GET)
+    public GpsRegisterRate findByGpsRegisterAndUser(@RequestParam("registerId") Long registerId,
+                                                    @RequestParam("userId") Long userId) {
+        GpsRegister register = new GpsRegister();
+        register.setId(registerId);
+
+        User user = new User();
+        user.setId(userId);
+
+        return repository.findByGpsRegisterAndUser(register, user);
     }
 
     @RequestMapping(value = "sum", method = RequestMethod.GET)

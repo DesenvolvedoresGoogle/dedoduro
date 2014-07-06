@@ -68,4 +68,8 @@ public class GpsRegister  extends AbstractPersistable<Long> {
     public void setCategory(Category category) {
         this.category = category;
     }
+
+    public void setId(Long id) {
+        super.setId(id);
+    }
 }

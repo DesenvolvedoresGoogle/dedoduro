@@ -1,15 +1,13 @@
 package ro.dedodu.dedoduro.ws.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ro.dedodu.dedoduro.ws.model.entity.GpsRegister;
 import ro.dedodu.dedoduro.ws.model.entity.GpsRegisterComment;
 import ro.dedodu.dedoduro.ws.model.repository.GpsRegisterCommentRepository;
-
-import java.util.List;
 
 /**
  * Controlador que provê o acesso aos Comentários dos Eventos
@@ -30,8 +28,16 @@ public class GpsRegisterCommentController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<GpsRegisterComment> findAll() {
-        return repository.findAll();
+    public Page<GpsRegisterComment> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    @RequestMapping(value = "byRegister/{registerId}", method = RequestMethod.GET)
+    public Page<GpsRegisterComment> findAllByGpsRegisterId(@PathVariable("registerId") Long registerId, Pageable pageable) {
+        GpsRegister register = new GpsRegister();
+        register.setId(registerId);
+
+        return repository.findAllByGpsRegister(register, pageable);
     }
 
     @Transactional

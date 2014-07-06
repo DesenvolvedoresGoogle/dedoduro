@@ -6,8 +6,12 @@ import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.MultipartConfigElement;
+import java.util.List;
 
 /**
  * Backend para as aplicações da plataforma Dedo Duro.
@@ -18,7 +22,7 @@ import javax.servlet.MultipartConfigElement;
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
-public class App {
+public class App extends WebMvcConfigurerAdapter {
 
     @Bean
     MultipartConfigElement multipartConfigElement() {
@@ -28,6 +32,15 @@ public class App {
         //TODO Implementar os limites para o arquivo.
 
         return factory.createMultipartConfig();
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();
+
+        argumentResolvers.add(resolver);
+
+        super.addArgumentResolvers(argumentResolvers);
     }
 
     /**

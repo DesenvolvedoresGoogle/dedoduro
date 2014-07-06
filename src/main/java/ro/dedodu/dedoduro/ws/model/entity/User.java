@@ -33,4 +33,8 @@ public class User extends AbstractPersistable<Long> {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public void setId(Long id) {
+        super.setId(id);
+    }
 }
