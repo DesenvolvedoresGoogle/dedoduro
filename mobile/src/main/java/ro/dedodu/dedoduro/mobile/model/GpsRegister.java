@@ -1,5 +1,7 @@
 package ro.dedodu.dedoduro.mobile.model;
 
+import java.util.HashMap;
+
 public class GpsRegister {
 
     private Long id;
@@ -55,5 +57,17 @@ public class GpsRegister {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public static class Converter {
+        public static GpsRegister from(HashMap map) {
+            GpsRegister gpsRegister = new GpsRegister();
+            gpsRegister.setId(Long.valueOf((Integer) map.get("id")));
+            gpsRegister.setDescription((String) map.get("description"));
+            gpsRegister.setLat((Double) map.get("lat"));
+            gpsRegister.setLng((Double) map.get("lng"));
+            gpsRegister.setCategory(Category.Converter.from((HashMap) map.get("category")));
+            return gpsRegister;
+        }
     }
 }

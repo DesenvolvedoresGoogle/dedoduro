@@ -28,12 +28,14 @@ public class HttpClient {
     public enum RequestURL {
         CATEGORY("categories"),
         USER("users"),
-        GPS_REGISTER("registers");
+        GPS_REGISTER("registers"),
+        GPS_REGISTER_RATE("karma"),
+        GPS_REGISTER_COMMENT("comments");
 
         private String value;
 
         private RequestURL(String value) {
-            this.value = "http://10.10.10.127:8080/" + value;
+            this.value = "http://192.168.43.182:8080/" + value;
         }
 
         public String value() {

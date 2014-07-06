@@ -39,5 +39,6 @@
     <string name="less">-</string>
     <string name="comment">Comentar</string>
     <string name="image">Adicionar imagem</string>
+    <string name="lbl_add_commet">Adcionar comentario</string>
 
 </resources>

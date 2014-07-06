@@ -9,12 +9,20 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 import ro.dedodu.dedoduro.mobile.R;
@@ -22,8 +30,15 @@ import ro.dedodu.dedoduro.mobile.adapter.CategoryAdapter;
 import ro.dedodu.dedoduro.mobile.dao.CategoryDao;
 import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
 import ro.dedodu.dedoduro.mobile.dialogs.CategorySelectionDialog;
+import ro.dedodu.dedoduro.mobile.dialogs.GpsRegisterInformationDialog;
+import ro.dedodu.dedoduro.mobile.http.HttpClient;
+import ro.dedodu.dedoduro.mobile.http.JacksonJsonRequest;
 import ro.dedodu.dedoduro.mobile.model.Category;
+import ro.dedodu.dedoduro.mobile.model.GpsRegister;
 import roboguice.inject.InjectView;
+
+import static com.android.volley.Request.Method.GET;
+import static ro.dedodu.dedoduro.mobile.http.HttpClient.RequestURL.GPS_REGISTER;
 
 public class MainActivity extends RoboSherlockActivity {
 
@@ -36,6 +51,8 @@ public class MainActivity extends RoboSherlockActivity {
     private GoogleMap map;
     private ActionBarDrawerToggle drawerToggle;
     private CategoryDao categoryDao;
+
+    HashMap<String, GpsRegister> gpsRegisterMap = new HashMap<String, GpsRegister>();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +112,49 @@ public class MainActivity extends RoboSherlockActivity {
                     gpsRegisterDialog.show(getFragmentManager(), "");
                 }
             });
+
+            getGpsRegister();
         }
+    }
+
+    private void getGpsRegister() {
+        RequestQueue queue = HttpClient.getClient(this).getRequestQueue();
+        JacksonJsonRequest<Void, List> request = new JacksonJsonRequest<Void, List>(GET, GPS_REGISTER.value(), null, new Response.Listener<List>() {
+            @Override
+            public void onResponse(List response) {
+                for (Object gpsRegister : response) {
+                    pinGpsRegisterMarker(GpsRegister.Converter.from((HashMap) gpsRegister));
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }, List.class);
+
+        queue.add(request);
+        queue.start();
+    }
+
+    private void pinGpsRegisterMarker(GpsRegister gpsRegister) {
+        MarkerOptions markerOptions =  new MarkerOptions();
+        markerOptions
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                .position(new LatLng(gpsRegister.getLat(), gpsRegister.getLng()));
+
+        Marker marker = map.addMarker(markerOptions);
+
+        gpsRegisterMap.put(marker.getId(), gpsRegister);
+
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                GpsRegisterInformationDialog gpsRegisterInformationDialog = new GpsRegisterInformationDialog(gpsRegisterMap.get(marker.getId()));
+                gpsRegisterInformationDialog.show(getFragmentManager(), null);
+                return false;
+            }
+        });
     }
 
     @Override
