@@ -1,6 +1,5 @@
 package ro.dedodu.dedoduro.mobile.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -22,11 +21,8 @@ import ro.dedodu.dedoduro.mobile.R;
 import ro.dedodu.dedoduro.mobile.adapter.CategoryAdapter;
 import ro.dedodu.dedoduro.mobile.dao.CategoryDao;
 import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
-import ro.dedodu.dedoduro.mobile.dialogs.GpsRegisterDialog;
+import ro.dedodu.dedoduro.mobile.dialogs.CategorySelectionDialog;
 import ro.dedodu.dedoduro.mobile.model.Category;
-import ro.dedodu.dedoduro.mobile.model.GpsRegister;
-import ro.dedodu.dedoduro.mobile.model.User;
-import ro.dedodu.dedoduro.mobile.services.PullingService;
 import roboguice.inject.InjectView;
 
 public class MainActivity extends RoboSherlockActivity {
@@ -47,9 +43,6 @@ public class MainActivity extends RoboSherlockActivity {
 
         DaoFactory<CategoryDao> daoFactory = new DaoFactory<CategoryDao>();
         categoryDao = daoFactory.create(this, CategoryDao.class);
-
-        Intent service = new Intent(this, PullingService.class);
-        startService(service);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -98,7 +91,7 @@ public class MainActivity extends RoboSherlockActivity {
             map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                 @Override
                 public void onMapLongClick(LatLng latLng) {
-                    GpsRegisterDialog gpsRegisterDialog =  new GpsRegisterDialog(latLng);
+                    CategorySelectionDialog gpsRegisterDialog =  new CategorySelectionDialog(latLng);
                     gpsRegisterDialog.show(getFragmentManager(), "");
                 }
             });

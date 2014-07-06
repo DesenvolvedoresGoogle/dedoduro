@@ -5,6 +5,8 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.HashMap;
 
+import ro.dedodu.dedoduro.mobile.R;
+
 @DatabaseTable(tableName = "category")
 public class Category {
 
@@ -52,13 +54,36 @@ public class Category {
         this.img = img;
     }
 
-    public enum Image {
-        VIOLENCY,
-        EDUCATION,
-        COMPANY,
-        SERVICE,
-        TRACK,
-        STREET
+    public int imageResource() {
+        return Image.getImageResource(getImg());
+    }
+
+    private enum Image {
+        VIOLENCE("violence", R.drawable.violence),
+        EDUCATION("education", R.drawable.education),
+        COMPANY("company", R.drawable.company),
+        SERVICE("service", R.drawable.service),
+        TRACK("track", R.drawable.track),
+        STREET("street", R.drawable.street);
+
+        private String value;
+        private int resource;
+
+        private Image(String value, int resource) {
+            this.value = value;
+            this.resource = resource;
+        }
+
+        public static int getImageResource(String type) {
+            int resourceId = 0;
+            for (Image image : values()) {
+                if (image.value.equals(type)) {
+                    resourceId = image.resource;
+                }
+            }
+
+            return resourceId;
+        }
     }
 
     public static class Converter {

@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
 import ro.dedodu.dedoduro.mobile.dao.UserDao;
+import ro.dedodu.dedoduro.mobile.services.PullingService;
 
 public class SplashScreenActivity extends Activity {
 
@@ -15,12 +16,19 @@ public class SplashScreenActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        startPullingService();
+
         Class activityClass = AuthActivity.class;
         if (hasUserAuthenticated()) {
             activityClass = MainActivity.class;
         }
         Intent intent = new Intent(this, activityClass);
         startActivity(intent);
+    }
+
+    public void startPullingService() {
+        Intent service = new Intent(this, PullingService.class);
+        startService(service);
     }
 
     public boolean hasUserAuthenticated() {

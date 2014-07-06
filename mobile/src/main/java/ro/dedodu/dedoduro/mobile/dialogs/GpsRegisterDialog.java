@@ -7,79 +7,81 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.EditText;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import ro.dedodu.dedoduro.mobile.R;
-import ro.dedodu.dedoduro.mobile.dao.CategoryDao;
-import ro.dedodu.dedoduro.mobile.dao.DaoFactory;
-import ro.dedodu.dedoduro.mobile.model.Category;
+import ro.dedodu.dedoduro.mobile.http.HttpClient;
+import ro.dedodu.dedoduro.mobile.http.JacksonJsonRequest;
 import ro.dedodu.dedoduro.mobile.model.GpsRegister;
-import ro.dedodu.dedoduro.mobile.model.User;
+
+import static com.android.volley.Request.Method.POST;
+import static com.android.volley.Response.Listener;
+import static ro.dedodu.dedoduro.mobile.http.HttpClient.RequestURL.GPS_REGISTER;
 
 public class GpsRegisterDialog extends DialogFragment {
 
-    private LatLng latLng;
-    private CategoryDao categoryDao;
-
     private GpsRegister gpsRegister;
 
-    public GpsRegisterDialog(LatLng latLng) {
-        this.latLng = latLng;
+    public GpsRegisterDialog(GpsRegister gpsRegister) {
+        this.gpsRegister = gpsRegister;
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savadInstanceState) {
-        initializeCategoryDao();
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         return getCustomDialog();
     }
 
-    private AlertDialog getCustomDialog() {
+    private Dialog getCustomDialog() {
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_gps_register, null);
-
-        makeCategoryLayout(dialogView);
+        final View dialogView = inflater.inflate(R.layout.gps_register_dialog, null);
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder
-                .setTitle(R.string.category_dialog_title)
-                .setView(dialogView);
+                .setView(dialogView)
+                .setTitle(R.string.register_activity)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        fillGpsRegister(dialogView);
+                        registerActivity();
+                    }
+                });
 
         return dialogBuilder.create();
     }
 
-    private void makeCategoryLayout(View dialogView) {
-        for (Category category : getCategories()) {
-
-        }
+    private void fillGpsRegister(View dialogView) {
+        EditText edtDescription = (EditText) dialogView.findViewById(R.id.edt_description);
+        gpsRegister.setDescription(edtDescription.getText().toString());
     }
 
-    private List<Category> getCategories() {
-        List<Category> categories = new ArrayList<Category>();
-        try {
-            categories = categoryDao.queryForAll();
-        } catch (SQLException ignored) {}
-        return categories;
-    }
+    private void registerActivity() {
+        RequestQueue queue = HttpClient.getClient(getActivity()).getRequestQueue();
 
-    private void initializeCategoryDao() {
-        DaoFactory<CategoryDao> daoDaoFactory =  new DaoFactory<CategoryDao>();
-        categoryDao = daoDaoFactory.create(getActivity(), CategoryDao.class);
-    }
+        JacksonJsonRequest<GpsRegister, Long> request =  new JacksonJsonRequest<GpsRegister, Long>(POST, GPS_REGISTER.value(), gpsRegister, new Listener<Long>() {
+            @Override
+            public void onResponse(Long response) {
+                gpsRegister.setId(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }, Long.class);
 
-    private void createGpsRegister(Category category) {
-        User user = new User();
-        user.setId(1l);
-
-        gpsRegister = new GpsRegister();
-        gpsRegister.setUser(user);
-        gpsRegister.setCategory(category);
-        gpsRegister.setLat(latLng.latitude);
-        gpsRegister.setLng(latLng.longitude);
+        queue.add(request);
+        queue.start();
     }
 }

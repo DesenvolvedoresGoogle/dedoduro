@@ -38,7 +38,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
         ImageView icon = (ImageView) row.findViewById(R.id.icon);
         TextView label = (TextView) row.findViewById(R.id.label);
 
-        icon.setImageResource(R.drawable.ic_launcher);
+        icon.setImageResource(category.imageResource());
         label.setText(category.getName());
 
         row.setOnClickListener(new View.OnClickListener() {

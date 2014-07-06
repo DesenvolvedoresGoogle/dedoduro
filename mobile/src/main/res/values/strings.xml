@@ -29,5 +29,15 @@
     <string name="title_activity_auth">AuthActivity</string>
     <string name="lbl_modal_title">Selecione a categoria</string>
     <string name="category_dialog_title">Selecione uma categoria</string>
+    <string name="register_activity">Registrar Atividade</string>
+    <string name="cancel">Cancelar</string>
+    <string name="send">Enviar</string>
+    <string name="description">Descrição</string>
+    <string name="edt_description">Descrição</string>
+    <string name="karma">Classificar</string>
+    <string name="plus">+</string>
+    <string name="less">-</string>
+    <string name="comment">Comentar</string>
+    <string name="image">Adicionar imagem</string>
 
 </resources>
