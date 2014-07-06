@@ -1,7 +1,10 @@
 package ro.dedodu.dedoduro.ws.model.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import ro.dedodu.dedoduro.ws.model.entity.Category;
 import ro.dedodu.dedoduro.ws.model.entity.GpsRegister;
 
 /**
@@ -12,4 +15,7 @@ import ro.dedodu.dedoduro.ws.model.entity.GpsRegister;
  * @version 1.0.0
  */
 @Repository
-public interface GpsRegisterRepository extends JpaRepository<GpsRegister, Long> {}
+public interface GpsRegisterRepository extends JpaRepository<GpsRegister, Long> {
+
+    public Page<GpsRegister> findAllByCategory(Category category, Pageable pageable);
+}

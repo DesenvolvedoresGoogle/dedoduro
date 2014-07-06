@@ -35,4 +35,8 @@ public class Category extends AbstractPersistable<Long> {
     public void setImg(String img) {
         this.img = img;
     }
+
+    public void setId(Long id) {
+        super.setId(id);
+    }
 }
