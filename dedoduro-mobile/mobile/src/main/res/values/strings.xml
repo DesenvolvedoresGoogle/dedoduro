@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Dedo Duro</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="lbl_stress_intensity">Intensidade do stress</string>
+    <string name="lbl_stress_source">Causa do Stress</string>
+    <string name="lbl_one">1</string>
+    <string name="lbl_twoo">2</string>
+    <string name="lbl_three">3</string>
+    <string name="btn_register_only_gps">Registrar GPS apenas</string>
+    <string name="btn_distraction">Distrações</string>
+    <string name="lbl_stress_countdown">Stress Countdown</string>
+    <string name="lbl_with_brake">Com freio?</string>
+    <string name="lbl_with_sound">Com som?</string>
+    <string name="lbl_only_wifi">Somente Wi-fi?</string>
+    <string name="lbl_test_mode">Modo de teste</string>
+    <string name="btn_save">Salvar</string>
+    <string name="action_configuration">Configuração</string>
+    <string name="lbl_register_information">Entre com o seu e-mail para se registrar.</string>
+    <string name="btn_register">Registrar</string>
+    <string name="lbl_imporant_address">Esse endereço é importante para você?</string>
+    <string name="btn_yes">Sim</string>
+    <string name="btn_no">Não</string>
+    <string name="lbl_distraction_information">Não existem distrações cadastradas.</string>
+    <string name="drawer_open">Dedo duro</string>
+    <string name="drawer_close">Categorias</string>
+    <string name="title_activity_auth">AuthActivity</string>
+    <string name="lbl_modal_title">Selecione a categoria</string>
+    <string name="category_dialog_title">Selecione uma categoria</string>
+    <string name="register_activity">Registrar Atividade</string>
+    <string name="cancel">Cancelar</string>
+    <string name="send">Enviar</string>
+    <string name="description">Descrição</string>
+    <string name="edt_description">Descrição</string>
+    <string name="karma">Classificar</string>
+    <string name="plus">+</string>
+    <string name="less">-</string>
+    <string name="comment">Comentar</string>
+    <string name="image">Adicionar imagem</string>
+    <string name="lbl_add_commet">Adcionar comentario</string>
+
+</resources>
